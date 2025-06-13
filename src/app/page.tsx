@@ -42,20 +42,21 @@ export default function Home() {
       });
       
       setIsSubmitted(true);
-    } catch (err: any) {
+    } catch (err) {
       console.error('웨이트리스트 등록 실패:', err);
       
       // 다양한 에러 타입 처리
-      if (err?.code === '23505' || err?.message?.includes('duplicate key')) {
+      const error = err as Error & { code?: string };
+      if (error?.code === '23505' || error?.message?.includes('duplicate key')) {
         setError('이미 등록된 이메일 주소입니다.');
-      } else if (err?.message?.includes('Invalid API key') || err?.message?.includes('Invalid JWT')) {
+      } else if (error?.message?.includes('Invalid API key') || error?.message?.includes('Invalid JWT')) {
         setError('서버 설정 오류입니다. 관리자에게 문의해주세요.');
-      } else if (err?.message?.includes('relation "waitlist" does not exist')) {
+      } else if (error?.message?.includes('relation "waitlist" does not exist')) {
         setError('데이터베이스 테이블이 생성되지 않았습니다. 관리자에게 문의해주세요.');
-      } else if (err?.message?.includes('Failed to fetch') || err?.message?.includes('NetworkError')) {
+      } else if (error?.message?.includes('Failed to fetch') || error?.message?.includes('NetworkError')) {
         setError('네트워크 연결을 확인해주세요.');
       } else {
-        setError(`등록 중 오류가 발생했습니다: ${err?.message || '알 수 없는 오류'}`);
+        setError(`등록 중 오류가 발생했습니다: ${error?.message || '알 수 없는 오류'}`);
       }
     } finally {
       setIsLoading(false);
